@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Cumbia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="container">
+    <h1>Cumbia</h1>
+    <input id="audio_file" type="file" accept="audio/*" style="display:none" />
+    
+    <div class="row">
+      <div class="input-field col s12">
+        <button id="file_button" class="waves-effect waves-light btn"><i class="material-icons right">add</i>Select song</button>
+      </div>
+    </div>
+
+    <div id="song_container">
+    </div>
+    
+
+    <div class="col s12" id="create_chunk_card" style="display:none">
+      <h2 class="header">Create chunk</h2>
+      <div class="card horizontal">
+        <div class="card-stacked">
+          <div class="card-content">
+            <div class="row">
+              <div class="input-field col s12 m4">
+                <i class="material-icons prefix">description</i>
+                <input id="filename" type="text" value="Part A">
+                <label for="filename">File name</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s6 m2">
+                <i class="material-icons prefix" >access_time</i>
+                <input id="start" type="text" value="0">
+                <label for="start">Start</label>
+              </div>
+              <div class="input-field col s6 m2">
+                <i class="material-icons prefix">access_time</i>
+                <input id="end" type="text" value="0">
+                <label for="end">End</label>
+              </div>
+              <div class="input-field col s6 m2">
+                <i class="material-icons prefix">account_circle</i>
+                <input id="fadein" type="text" value="0">
+                <label for="fadein">Fade in</label>
+              </div>
+              <div class="input-field col s6 m2">
+                <i class="material-icons prefix">account_circle</i>
+                <input id="fadeout" type="text" value="0">
+                <label for="fadeout">Fade out</label>
+              </div>
+              <div class="input-field col s6 m2">
+                <i class="material-icons prefix">repeat</i>
+                <input id="repeat" type="text" value="1">
+                <label for="repeat">Repeat</label>
+              </div>
+            </div>
+          </div>
+          <div class="card-action">
+            <button id="chop_button" class="waves-effect waves-light btn"><i class="material-icons right">add</i>Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+          
+
+    <br/>
+    <br/>
+  </div>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+  <script src="audio.js"></script>
+  <script>
+    var song;
+
+    audio_file.onchange = function () {
+      var fileReader = new FileReader;
+      fileReader.onload = function () {
+        song = this.result;
+      }
+      fileReader.readAsArrayBuffer(this.files[0]);
+      var url = URL.createObjectURL(this.files[0]);
+
+      var audio = new Audio(url);
+      audio.controls = true;
+      audio.volume = 1;
+
+      audio.addEventListener("loadedmetadata", function () {
+        end.value = Math.floor(audio.duration);
+      });
+
+      song_container.innerHTML = this.files[0].name;
+      song_container.appendChild(audio);
+
+      create_chunk_card.style.display = "block";
+      file_button.parentElement.parentElement.style.display = "none";
+    };
+
+    file_button.onclick = function () {
+      audio_file.click();
+    }
+
+    chop_button.onclick = function () {
+      new AudioSprite(song).getChunk(
+        filename.value,
+        parseInt(start.value), 
+        parseInt(end.value), 
+        parseInt(fadein.value),
+        parseInt(fadeout.value),
+        parseInt(repeat.value)
+      );
+    };
+
+  </script>
+</body>
+
+</html>
