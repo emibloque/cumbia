@@ -13,18 +13,26 @@
 
 <body>
   <div class="container">
-    <h1>Cumbia</h1>
+    <h1 class="center-align">Cumbia</h1>
     <input id="audio_file" type="file" accept="audio/*" style="display:none" />
     
     <div class="row">
-      <div class="input-field col s12">
-        <button id="file_button" class="waves-effect waves-light btn"><i class="material-icons right">add</i>Select song</button>
+      <div class="input-field col s12 center-align" >
+        <button id="file_button" class="waves-effect waves-light btn ">Select song</button>
       </div>
     </div>
 
     <div id="song_container">
+     
     </div>
-    
+
+    <div id="audio_box" style="position:relative;height: 300px; width: 100%">
+      <div id="audio_box_shadow" style="position:absolute;background:rgba(208, 119, 53,0.1);height: 100%;width:0"></div>
+      <svg preserveAspectRatio="none" viewBox="0 0 1000 300"  id="audio_wave">
+        <polyline id="polygon" points="" 
+          stroke="#D07735" stroke-width="2" />
+      </svg>
+    </div>
 
     <div class="col s12" id="create_chunk_card" style="display:none">
       <h2 class="header">Create chunk</h2>
@@ -82,12 +90,51 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
   <script src="audio.js"></script>
   <script>
+    
+
+    let aPoints = [];
+    for (let i = 1; i<1000; i+=2) {
+      let value = (Math.floor(Math.random() * 150)) 
+      aPoints.push({x: i, y: value});
+    }
+    //  drawPoints(aPoints);
+
+    function drawPoints(aPoints) {
+      let points = ""; 
+      for (let i=0; i<aPoints.length; i++) {
+        points += aPoints[i].x + "," + aPoints[i].y + " "
+      }
+      console.log("finished");
+      polygon.setAttribute("points", points);
+    }
+
+
+
+
+
     var song;
+    var channelData;
 
     audio_file.onchange = function () {
       var fileReader = new FileReader;
       fileReader.onload = function () {
         song = this.result;
+        new AudioContext().decodeAudioData(song, function (data) {
+          
+          channelData = data.getChannelData(0);
+          let x=0;
+          let aPoints = [];
+
+          let min=0 ;
+          let max=0;
+          for (let i=0; i<channelData.length; i+=Math.floor(channelData.length/1000)) {
+            let sample = Math.max(-1, Math.min(1, channelData[i]));
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+            aPoints.push({ x: x, y: ((sample/32768*150)+150) });
+            x++;
+          }
+          drawPoints(aPoints);
+        })
       }
       fileReader.readAsArrayBuffer(this.files[0]);
       var url = URL.createObjectURL(this.files[0]);
@@ -98,6 +145,10 @@
 
       audio.addEventListener("loadedmetadata", function () {
         end.value = Math.floor(audio.duration);
+      });
+
+      audio.addEventListener("timeupdate", function (a) {
+        audio_box_shadow.style.width = (audio.currentTime/audio.duration*100) + "%";
       });
 
       song_container.innerHTML = this.files[0].name;

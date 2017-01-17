@@ -33,8 +33,8 @@ class AudioSprite {
 
     var link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', this.fileName + '.mp3');
-    link.innerHTML = 'Download ' + this.fileName + '.mp3';
+    link.setAttribute('download', this.fileName + '.wav');
+    link.innerHTML = 'Download ' + this.fileName + '.wav';
     document.body.appendChild(link);
 
   }
@@ -91,7 +91,7 @@ class FileCreator {
 
   isWritingChunk(writer, iteration) {
     let positionWithoutHeaders = writer.getPosition() - WavBufferWriter.getHeadersSize();
-    let currentChunkLength = (this.destinationLength - WavBufferWriter.getHeadersSize()) / (this.repeatTimes - iteration);
+    let currentChunkLength = (this.destinationLength - WavBufferWriter.getHeadersSize()) / this.repeatTimes * (iteration + 1);
     return positionWithoutHeaders < currentChunkLength;
   }
 
