@@ -33,8 +33,8 @@ class AudioSprite {
 
     var link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', this.fileName + '.wav');
-    link.innerHTML = 'Download ' + this.fileName + '.wav';
+    link.setAttribute('download', this.fileName + '.mp3');
+    link.innerHTML = 'Download ' + this.fileName + '.mp3';
     document.body.appendChild(link);
 
   }
